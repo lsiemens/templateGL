@@ -11,7 +11,9 @@
 #define DLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 using namespace glm;
 
 GLuint CompileShader(const char* shader_file_path, GLenum shader_type){
@@ -93,7 +95,8 @@ int main() {
     }
 
     GLFWwindow* window;
-    window = glfwCreateWindow( 1024, 768, "GLTest", NULL, NULL);
+    int width=1024, height=768;
+    window = glfwCreateWindow( width, height, "GLTest", NULL, NULL);
     if (window == NULL) {
         std::cerr << "Failed to create GLFW window.\n";
         glfwTerminate();
@@ -123,8 +126,21 @@ int main() {
     GLuint programID = LoadShaders("vertex.shader", "fragment.shader");
     glClearColor(.6f, .65f, .7f, 1.f);
 
+
+    GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+
     do {
         glClear(GL_COLOR_BUFFER_BIT);
+
+        //Camera
+
+        glm::mat4 Projection = glm::perspective(glm::radians(45.f), (float)width/(float)height, 0.1f, 100.f);
+        glm::mat4 View = glm::lookAt(glm::vec3(4, 3, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        glm::mat4 Model = glm::mat4(1.f);
+
+        glm::mat4 mvp = Projection*View*Model;
+
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
         //Draw
         glUseProgram(programID);
