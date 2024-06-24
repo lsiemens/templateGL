@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fstream>
 #include <stdexcept>
+#include <string>
 
 // keep this before all other OpenGL libraries
 #define GLEW_STATIC
@@ -14,7 +15,48 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
-using namespace glm;
+
+class LoopLog {
+private:
+    static LoopLog* instance;
+
+    LoopLog() {
+        std::clog << "Initalize LoopLog!\n";
+    }
+
+    void resetCursor() {
+        std::string buffer = log.str();
+        int count = 0;
+        for (char &c : buffer) {
+            if (c == '\n') {
+                std::cout << "\033[A";
+            }
+        }
+    }
+
+    LoopLog(const LoopLog&) = delete;
+    LoopLog& operator=(const LoopLog&) = delete;
+public:
+    std::stringstream log;
+
+    static LoopLog* getInstance() {
+        if (instance == nullptr) {
+            instance = new LoopLog();
+        }
+        return instance;
+    }
+
+    void flush(){
+        std::string buffer = log.str();
+        if (buffer != "") {
+            std::cout << buffer;
+            resetCursor();
+            std::cout.flush();
+        }
+        log.str("");
+        log.clear();
+    }
+}; LoopLog* LoopLog::instance = nullptr;
 
 class FrameTimer {
 // Call timer() once in the render loop preferably at the begining or end.
@@ -28,11 +70,14 @@ class BasicTimer : public FrameTimer {
 private:
     double time, previous_time, previous_update;
     unsigned int frame_count;
+    LoopLog* loopLog;
 public:
     BasicTimer() {
         time = glfwGetTime();
         previous_time = previous_update = time;
         frame_count = 0;
+
+        loopLog = LoopLog::getInstance();
     }
 
     double timer() override {
@@ -41,8 +86,7 @@ public:
         time = glfwGetTime();
 
         if (time - previous_update >= 1.0f) {
-            std::clog << "\rFPS: " << (double)frame_count/(time - previous_update);
-            std::clog.flush();
+            loopLog->log << "FPS: " << (double)frame_count/(time - previous_update) << "\n";
             previous_update = time;
             frame_count = 0;
         }
@@ -62,6 +106,7 @@ private:
     double current_M2, previous_M2;
 
     unsigned int frame_count;
+    LoopLog* loopLog;
 
     void resetWelford() {
         min_dt = INFINITY, max_dt = -INFINITY, mean_dt = previous_mean_dt = 0;
@@ -73,6 +118,8 @@ public:
         time = glfwGetTime();
         previous_time = previous_update = time;
         resetWelford();
+
+        loopLog = LoopLog::getInstance();
     }
 
     double timer() override {
@@ -95,10 +142,8 @@ public:
         }
 
         if (time - previous_update >= 1.0f) {
-            std::clog << "FPS: " << (double)frame_count/(time - previous_update) << "\n";
-            std::clog << "Delta t (in ms) : " << 1000*mean_dt << " ± " << 1000*std::sqrt(current_M2/(frame_count - 1))  << " [Min|Max]: [" << 1000*min_dt << " | " << 1000*max_dt << "]\n";
-            std::clog << "\033[A\033[A\033[A";
-            std::clog.flush();
+            loopLog->log << "FPS: " << (double)frame_count/(time - previous_update) << "\n";
+            loopLog->log << "Delta t (in ms) : " << 1000*mean_dt << " ± " << 1000*std::sqrt(current_M2/(frame_count - 1))  << " [Min|Max]: [" << 1000*min_dt << " | " << 1000*max_dt << "]\n";
             previous_update = time;
             resetWelford();
         }
@@ -200,9 +245,6 @@ public:
     }
 
     void setVertexBuffer(GLfloat data[], unsigned int bufferSize) {
-        //if (glIsBuffer(vertexbuffer) == GL_TRUE) {
-        //    throw std::runtime_error("Could not set vertex buffer. The buffer is already in use.");
-        //}
         vertexBufferSize = bufferSize;
         glGenBuffers(1, &vertexbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -210,9 +252,6 @@ public:
     }
 
     void setColorBuffer(GLfloat data[], unsigned int bufferSize) {
-        //if (glIsBuffer(colorbuffer) == GL_TRUE) {
-        //    throw std::runtime_error("Could not set color buffer. The buffer is already in use.");
-        //}
         glGenBuffers(1, &colorbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
         glBufferData(GL_ARRAY_BUFFER, bufferSize, data, GL_STATIC_DRAW);
@@ -296,7 +335,7 @@ void Controlls(double dt, GLFWwindow* window, Camera &camera) {
     horizontalAngle = -mouseSensitivity*xpos;
     verticalAngle = mouseSensitivity*ypos;
 
-    glm::vec3 direction = vec3(std::cos(verticalAngle)*std::sin(horizontalAngle),
+    glm::vec3 direction = glm::vec3(std::cos(verticalAngle)*std::sin(horizontalAngle),
                      std::sin(verticalAngle),
                      std::cos(verticalAngle)*std::cos(horizontalAngle));
 
@@ -329,6 +368,8 @@ void Controlls(double dt, GLFWwindow* window, Camera &camera) {
     camera.direction = direction;
     camera.up = up;
     camera.position += delta_position;
+    LoopLog* loopLog = LoopLog::getInstance();
+    loopLog->log << "Camera " << camera.position.x << " " << camera.position.y << " " << camera.position.z << "\n";
 }
 
 Object initalizeCube(GLuint shaderID) {
@@ -418,13 +459,7 @@ Object initalizeSurface(GLuint shaderID) {
                     g_vertex_buffer_data[1 + 3*vindex] = y;
                     g_vertex_buffer_data[2 + 3*vindex] = std::exp(-x*x - y*y);
                 }
-
-                //0 + 3*tindex
-                //1 + 3*tindex
-                //2 + 3*tindex
             }
-            // tindex = 2*qindex, 1 + 2*qindex
-            // vindex = 
         }
     }
 
@@ -442,6 +477,7 @@ Object initalizeSurface(GLuint shaderID) {
 }
 
 int main() {
+    LoopLog* loopLog = LoopLog::getInstance();
     srand(time(NULL));
     if (!glfwInit()) {
         std::cerr << "Failed to initalize GLFW\n";
@@ -479,7 +515,7 @@ int main() {
     // Initalize shader
     GLuint shaderID = LoadShaders("vertex.shader", "fragment.shader");
 
-    BasicTimer timer = BasicTimer();
+    AdvancedTimer timer = AdvancedTimer();
     Camera camera = Camera(shaderID);
     Object cube = initalizeCube(shaderID);
     cube.velocity = glm::vec3(1.f, 0.f, 0.f);
@@ -487,10 +523,10 @@ int main() {
     cube2.velocity = glm::vec3(0.f, 2.f, 0.f);
     Object cube3 = initalizeSurface(shaderID);
     double dt;
-    float l = 0;
     do {
         // Timing
         dt = timer.timer();
+        loopLog->flush();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
