@@ -1,5 +1,5 @@
-run: hi; ./hi
+run: testGL; ./testGL
 
-hi: hi.cpp; g++ hi.cpp -o hi
+testGL: testGL.cpp; g++ -g testGL.cpp -o testGL -lGLEW -lglfw -lGL -ldl
 
-clean: ; rm -f hi
+clean: ; rm -f testGL

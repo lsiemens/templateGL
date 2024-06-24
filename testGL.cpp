@@ -427,10 +427,11 @@ Object initalizeCube(GLuint shaderID) {
 
 Object initalizeSurface(GLuint shaderID) {
     float t=0, s=0;
-    int n = 10;
+    int n = 100;
     int verticii = (n - 1)*(n - 1)*2*3; // (n - 1)^2 quads, 2 triangles per quad, 3 points per triangle
 
     GLfloat g_vertex_buffer_data[verticii*3];
+    GLfloat g_color_buffer_data[verticii*3];
 
     for (int i = 0; i < n - 1; i++) {
         for (int j = 0; j < n - 1; j++) {
@@ -453,20 +454,20 @@ Object initalizeSurface(GLuint shaderID) {
                             j_p++;
                         }
                     }
-                    float x = 5*(float)(i_p - n/2)/n;
-                    float y = 5*(float)(j_p - n/2)/n;
+                    float ux = (float)(i_p)/n;
+                    float uy = (float)(j_p)/n;
+                    float x = 5*(ux - 0.5);
+                    float y = 5*(uy - 0.5);
                     g_vertex_buffer_data[3*vindex] = x;
                     g_vertex_buffer_data[1 + 3*vindex] = y;
                     g_vertex_buffer_data[2 + 3*vindex] = std::exp(-x*x - y*y);
+
+                    g_color_buffer_data[3*vindex] = ux;
+                    g_color_buffer_data[1 + 3*vindex] = uy;
+                    g_color_buffer_data[2 + 3*vindex] = std::exp(-x*x - y*y);
                 }
             }
         }
-    }
-
-    GLfloat g_color_buffer_data[verticii*3];
-
-    for (int i=0; i < verticii*3; i++) {
-        g_color_buffer_data[i] = static_cast <GLfloat> (rand()) / static_cast<float> (RAND_MAX);
     }
 
     Model model = Model(shaderID);
