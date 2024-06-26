@@ -3,7 +3,6 @@
 #include <random>
 
 #include <iostream>
-#include <sstream>
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -16,47 +15,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
-class LoopLog {
-private:
-    static LoopLog* instance;
-
-    LoopLog() {
-        std::clog << "Initalize LoopLog!\n";
-    }
-
-    void resetCursor() {
-        std::string buffer = log.str();
-        int count = 0;
-        for (char &c : buffer) {
-            if (c == '\n') {
-                std::cout << "\033[A";
-            }
-        }
-    }
-
-    LoopLog(const LoopLog&) = delete;
-    LoopLog& operator=(const LoopLog&) = delete;
-public:
-    std::stringstream log;
-
-    static LoopLog* getInstance() {
-        if (instance == nullptr) {
-            instance = new LoopLog();
-        }
-        return instance;
-    }
-
-    void flush(){
-        std::string buffer = log.str();
-        if (buffer != "") {
-            std::cout << buffer;
-            resetCursor();
-            std::cout.flush();
-        }
-        log.str("");
-        log.clear();
-    }
-}; LoopLog* LoopLog::instance = nullptr;
+#include "looplog.h"
 
 class FrameTimer {
 // Call timer() once in the render loop preferably at the begining or end.

@@ -1,5 +1,24 @@
-run: testGL; ./testGL
+GLFLAG=-lGLEW -lglfw -lGL -ldl
+FLAGS=-Wall -g
 
-testGL: testGL.cpp; g++ -g testGL.cpp -o testGL -lGLEW -lglfw -lGL -ldl
+run: testGL
+	./testGL
 
-clean: ; rm -f testGL
+testGL: looplog.o
+	g++ testGL.cpp looplog.o -o testGL $(GLFLAG) $(FLAGS)
+
+looplog.o:
+	g++ -c looplog.cpp -o looplog.o $(FLAGS)
+
+open_documentation: Documentation
+	open ./Documentation/html/index.html
+
+Documentation:
+	doxygen Doxyfile
+
+clean:
+	rm looplog.o -f
+	rm testGL -f
+
+clean_doc:
+	rm Documentation -rf
