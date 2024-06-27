@@ -4,8 +4,11 @@ FLAGS=-Wall -g
 run: testGL
 	./testGL
 
-testGL: looplog.o frame_timer.o model.o object.o camera.o
-	g++ testGL.cpp looplog.o frame_timer.o model.o object.o camera.o -o testGL $(GLFLAG) $(FLAGS)
+testGL: looplog.o frame_timer.o model.o object.o camera.o shaders.o
+	g++ testGL.cpp looplog.o frame_timer.o model.o object.o camera.o shaders.o -o testGL $(GLFLAG) $(FLAGS)
+
+shaders.o:
+	g++ -c shaders.cpp -o shaders.o $(GLFLAG) $(FLAGS)
 
 camera.o:
 	g++ -c camera.cpp -o camera.o $(GLFLAG) $(FLAGS)
@@ -29,6 +32,7 @@ Documentation:
 	doxygen Doxyfile
 
 clean:
+	rm shaders.o -f
 	rm model.o object.o camera.o -f
 	rm looplog.o frame_timer.o -f
 	rm testGL -f
