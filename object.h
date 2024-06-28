@@ -9,9 +9,9 @@
 /// A class for defineing objects using a given model.
 class Object {
 public:
-    glm::mat4 modelSpaceToWorldSpace;
-    glm::vec3 velocity;
     Model model;
+    glm::vec3 velocity;
+    glm::mat4 modelSpaceToWorldSpace;
 
     Object(Model model, glm::vec3 velocity=glm::vec3());
     void drawObject();

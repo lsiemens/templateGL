@@ -1,19 +1,12 @@
-#include <vector>
 #include <cmath>
 #include <random>
-
 #include <iostream>
-#include <fstream>
-#include <stdexcept>
-#include <string>
 
 // keep this before all other OpenGL libraries
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
 
 #include "looplog.h"
 #include "frame_timer.h"
@@ -110,7 +103,7 @@ Object initalizeCube(GLuint shaderID) {
 
     GLfloat g_color_buffer_data[12*3];
 
-    for (int i=0; i < std::size(g_color_buffer_data); i++) {
+    for (unsigned int i=0; i < std::size(g_color_buffer_data); i++) {
         g_color_buffer_data[i] = static_cast <GLfloat> (rand()) / static_cast<float> (RAND_MAX);
     }
 
@@ -122,7 +115,6 @@ Object initalizeCube(GLuint shaderID) {
 }
 
 Object initalizeSurface(GLuint shaderID) {
-    float t=0, s=0;
     int n = 100;
     int verticii = (n - 1)*(n - 1)*2*3; // (n - 1)^2 quads, 2 triangles per quad, 3 points per triangle
 
