@@ -1,29 +1,24 @@
-GLFLAG=-lGLEW -lglfw -lGL -ldl
-FLAGS=-Wall -g
+CXX = g++
+LD = $(CXX)
 
-run: testGL
-	./testGL
+CXXFLAGS = -g -Wall
+CPPFLAGS =
 
-testGL: looplog.o frame_timer.o model.o object.o camera.o shaders.o
-	g++ testGL.cpp looplog.o frame_timer.o model.o object.o camera.o shaders.o -o testGL $(GLFLAG) $(FLAGS)
+LDFLAGS = -g
+LDLIBS = -lGLEW -lglfw -lGL -ldl
 
-shaders.o:
-	g++ -c shaders.cpp -o shaders.o $(GLFLAG) $(FLAGS)
+SRCS = testGL.cpp looplog.cpp frame_timer.cpp model.cpp object.cpp camera.cpp shaders.cpp
+OBJS = $(subst .cpp,.o, $(SRCS))
+TARGET = testGL
 
-camera.o:
-	g++ -c camera.cpp -o camera.o $(GLFLAG) $(FLAGS)
+run: $(TARGET)
+	./$(TARGET)
 
-object.o:
-	g++ -c object.cpp -o object.o $(GLFLAG) $(FLAGS)
+$(TARGET): $(OBJS)
+	$(LD) $(LDFLAGS) -o $(TARGET) $(OBJS) $(LDLIBS)
 
-model.o:
-	g++ -c model.cpp -o model.o $(GLFLAG) $(FLAGS)
-
-frame_timer.o:
-	g++ -c frame_timer.cpp -o frame_timer.o $(FLAGS)
-
-looplog.o:
-	g++ -c looplog.cpp -o looplog.o $(FLAGS)
+$(OBJS): %.o: %.cpp
+	$(CXX) -c $^ -o $@ $(CXXFLAGS) $(CPPFLAGS)
 
 open_documentation: Documentation
 	open ./Documentation/html/index.html
@@ -32,10 +27,10 @@ Documentation:
 	doxygen Doxyfile
 
 clean:
-	rm shaders.o -f
-	rm model.o object.o camera.o -f
-	rm looplog.o frame_timer.o -f
-	rm testGL -f
+	rm $(OBJS) -f
+	rm $(TARGET) -f
 
 clean_doc:
 	rm Documentation -rf
+
+.PHONY: clean clean_doc
