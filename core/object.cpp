@@ -8,10 +8,10 @@ void Object::drawObject() {
     this->model.drawModel(modelSpaceToWorldSpace);
 }
 
-void Object::update(double dt) {
-    velocity += 0.5f*(float)dt*acceleration;
-    position += (float)dt*velocity;
-    velocity += 0.5f*(float)dt*acceleration;
+void Object::update(float dt) {
+    velocity += 0.5f*dt*acceleration;
+    position += dt*velocity;
+    velocity += 0.5f*dt*acceleration;
     modelSpaceToWorldSpace = glm::translate(glm::mat4(1.0f), position);
 
     // fake a floor

@@ -13,13 +13,13 @@ BasicTimer::BasicTimer() {
     loopLog = LoopLog::getInstance();
 }
 
-double BasicTimer::timer() {
+float BasicTimer::timer() {
     frame_count++;
     previous_time = time;
     time = glfwGetTime();
 
     if (time - previous_update >= 1.0f) {
-        loopLog->log << "FPS: " << (double)frame_count/(time - previous_update) << " Δt (in ms) : " << (time - previous_update)/(double)frame_count << "\n";
+        loopLog->log << "FPS: " << static_cast<float>(frame_count)/(time - previous_update) << " Δt (in ms) : " << (time - previous_update)/static_cast<float>(frame_count) << "\n";
         previous_update = time;
         frame_count = 0;
     }
@@ -27,7 +27,7 @@ double BasicTimer::timer() {
     return time - previous_time;
 }
 
-double BasicTimer::getTime() const {
+float BasicTimer::getTime() const {
     return time;
 }
 
@@ -47,7 +47,7 @@ AdvancedTimer::AdvancedTimer() {
     loopLog = LoopLog::getInstance();
 }
 
-double AdvancedTimer::timer() {
+float AdvancedTimer::timer() {
     frame_count++;
     previous_time = time;
     previous_mean_dt = mean_dt;
@@ -55,7 +55,7 @@ double AdvancedTimer::timer() {
     time = glfwGetTime();
 
     //Welford' online algorith for variance
-    double dt = time - previous_time;
+    float dt = time - previous_time;
     mean_dt = previous_mean_dt + (dt - previous_mean_dt)/frame_count;
     current_M2 = previous_M2 + (dt - previous_mean_dt)*(dt - mean_dt);
 
@@ -67,7 +67,7 @@ double AdvancedTimer::timer() {
     }
 
     if (time - previous_update >= 1.0f) {
-        loopLog->log << "FPS: " << (double)frame_count/(time - previous_update) << "\n";
+        loopLog->log << "FPS: " << static_cast<float>(frame_count)/(time - previous_update) << "\n";
         loopLog->log << "Δt (in ms) : " << 1000*mean_dt << " ± " << 1000*std::sqrt(current_M2/(frame_count - 1))  << " [Min|Max]: [" << 1000*min_dt << " | " << 1000*max_dt << "]\n";
         previous_update = time;
         resetWelford();
@@ -76,6 +76,6 @@ double AdvancedTimer::timer() {
     return time - previous_time;
 }
 
-double AdvancedTimer::getTime() const {
+float AdvancedTimer::getTime() const {
     return time;
 }

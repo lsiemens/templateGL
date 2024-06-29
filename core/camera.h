@@ -12,7 +12,7 @@ public:
     glm::vec3 position;
     glm::vec3 direction;
     glm::vec3 up;
-    double FoV, aspectRatio;
+    float FoV, aspectRatio;
     GLuint matrixID;
 
     Camera(GLuint shaderID);

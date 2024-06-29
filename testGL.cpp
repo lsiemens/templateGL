@@ -15,9 +15,9 @@
 #include <camera.h>
 #include <shaders.h>
 
-void Controlls(double dt, GLFWwindow* window, Camera &camera) {
-    double horizontalAngle = 3.13f, verticalAngle = 0.f;
-    double speed = 3.f, mouseSensitivity = 0.001f;
+void Controlls(float dt, GLFWwindow* window, Camera &camera) {
+    float horizontalAngle = 3.13f, verticalAngle = 0.f;
+    float speed = 3.f, mouseSensitivity = 0.001f;
 
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
@@ -36,22 +36,22 @@ void Controlls(double dt, GLFWwindow* window, Camera &camera) {
     glm::vec3 delta_position = glm::vec3(0.f, 0.f, 0.f);
 
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        delta_position = (float)dt*direction*(float)speed;
+        delta_position = dt*direction*speed;
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        delta_position = -(float)dt*direction*(float)speed;
+        delta_position = -dt*direction*speed;
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        delta_position = (float)dt*right*(float)speed;
+        delta_position = dt*right*speed;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        delta_position = -(float)dt*right*(float)speed;
+        delta_position = -dt*right*speed;
     }
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-        delta_position = (float)dt*up*(float)speed;
+        delta_position = dt*up*speed;
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
-        delta_position = -(float)dt*up*(float)speed;
+        delta_position = -dt*up*speed;
     }
 
     camera.direction = direction;
@@ -240,7 +240,7 @@ int main() {
 
     Object torus = initalizeTorus(shaderID);
     torus.position = glm::vec3(-3.0f, 0.0f, -3.0f);
-    double dt;
+    float dt;
     do {
         // Timing
         dt = timer.timer();

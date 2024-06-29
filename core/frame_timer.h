@@ -15,22 +15,22 @@ public:
     /// Calculates the current time step and adds the frame rate to the
     /// `LoopLog` buffer.
     /// @return Time since the previous invocation of `timer()`.
-    virtual double timer() = 0;
+    virtual float timer() = 0;
     /// @return The time since the GLFW window was created.
-    virtual double getTime() const = 0;
+    virtual float getTime() const = 0;
 };
 
 /// This implementation of `FrameTimer` computes the times step and addes
 /// only the frame rate to the `LoopLog` buffer.
 class BasicTimer : public FrameTimer {
 private:
-    double time, previous_time, previous_update;
+    float time, previous_time, previous_update;
     unsigned int frame_count;
     LoopLog* loopLog;
 public:
     BasicTimer();
-    double timer() override;
-    double getTime() const override;
+    float timer() override;
+    float getTime() const override;
 };
 
 /// This implementation of `FrameTimer` computes the times step and addes
@@ -38,9 +38,9 @@ public:
 /// `LoopLog` buffer.
 class AdvancedTimer : public FrameTimer {
 private:
-    double time, previous_time, previous_update;
-    double min_dt, max_dt, mean_dt, previous_mean_dt;
-    double current_M2, previous_M2;
+    float time, previous_time, previous_update;
+    float min_dt, max_dt, mean_dt, previous_mean_dt;
+    float current_M2, previous_M2;
 
     unsigned int frame_count;
     LoopLog* loopLog;
@@ -50,8 +50,8 @@ private:
     void resetWelford();
 public:
     AdvancedTimer();
-    double timer() override;
-    double getTime() const override;
+    float timer() override;
+    float getTime() const override;
 };
 
 #endif

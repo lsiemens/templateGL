@@ -19,7 +19,7 @@ public:
 
     Object(Model model);
     void drawObject();
-    void update(double dt);
+    void update(float dt);
 };
 
 #endif

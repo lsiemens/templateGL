@@ -16,7 +16,7 @@ glm::mat4 Camera::getViewMatrix() {
 }
 
 glm::mat4 Camera::getProjectionMatrix() {
-    return glm::perspective((float)glm::radians(FoV), (float)aspectRatio, 0.1f, 100.f);
+    return glm::perspective(glm::radians(FoV), aspectRatio, 0.1f, 100.f);
     //return glm::ortho(-10.f, 10.f, -10.f, 10.f, 0.f, 100.f);
 }
 
