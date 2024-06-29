@@ -57,112 +57,137 @@ void Controlls(double dt, GLFWwindow* window, Camera &camera) {
     camera.direction = direction;
     camera.up = up;
     camera.position += delta_position;
-    LoopLog* loopLog = LoopLog::getInstance();
-    loopLog->log << "Camera " << camera.position.x << " " << camera.position.y << " " << camera.position.z << "\n";
 }
 
-Object initalizeCube(GLuint shaderID) {
-    GLfloat g_vertex_buffer_data[] = {
-        -1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f,
-         1.0f, 1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f,
-         1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
-         1.0f,-1.0f,-1.0f,
-         1.0f, 1.0f,-1.0f,
-         1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
-         1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-        -1.0f,-1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f,-1.0f, 1.0f,
-         1.0f,-1.0f, 1.0f,
-         1.0f, 1.0f, 1.0f,
-         1.0f,-1.0f,-1.0f,
-         1.0f, 1.0f,-1.0f,
-         1.0f,-1.0f,-1.0f,
-         1.0f, 1.0f, 1.0f,
-         1.0f,-1.0f, 1.0f,
-         1.0f, 1.0f, 1.0f,
-         1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f,-1.0f,
-         1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f,-1.0f,
-        -1.0f, 1.0f, 1.0f,
-         1.0f, 1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f,
-         1.0f,-1.0f, 1.0f
-    };
+glm::vec2 meshgrid(int x_resolution, int y_resolution, int vertex_index) {
+    int triangle_index = vertex_index / 3; // index of the triangle
+    int triangle_vertex_index = vertex_index % 3; // label of the vertex within the triangle
 
-    GLfloat g_color_buffer_data[12*3];
+    int quad_index = triangle_index / 2; // index of the quad
+    int quad_triangle_index = triangle_index % 2; // label of the triangle within the quad
 
-    for (unsigned int i=0; i < std::size(g_color_buffer_data); i++) {
-        g_color_buffer_data[i] = static_cast <GLfloat> (rand()) / static_cast<float> (RAND_MAX);
+    int column_index = quad_index / (x_resolution - 1); // index of the column
+    int row_index = quad_index % (x_resolution - 1); // index of the row
+
+    // lower left coordinate of triangle on the unit square
+    glm::vec2 unit_pos;
+    unit_pos.x = static_cast<float>(row_index)/(x_resolution - 1);
+    unit_pos.y = static_cast<float>(column_index)/(y_resolution - 1);
+
+    // offset for the upper right vertex
+    if (triangle_vertex_index == 1) {
+        unit_pos.x += 1.0f/(x_resolution - 1);
+        unit_pos.y += 1.0f/(y_resolution - 1);
     }
 
-    Model model = Model(shaderID);
-    model.setVertexBuffer(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
-    model.setColorBuffer(g_color_buffer_data, sizeof(g_color_buffer_data));
-    Object cube = Object(model);
-    return cube;
+    // offsets for the off diagonal vertex. The spesific offset
+    // is dependent on if it is the upper or lower triangle
+    if (triangle_vertex_index == 2){
+        if (quad_triangle_index == 0) {
+            unit_pos.x += 1.0f/(x_resolution - 1);
+        } else {
+            unit_pos.y += 1.0f/(y_resolution - 1);
+        }
+    }
+    return unit_pos;
 }
 
 Object initalizeSurface(GLuint shaderID) {
-    int n = 100;
-    int verticii = (n - 1)*(n - 1)*2*3; // (n - 1)^2 quads, 2 triangles per quad, 3 points per triangle
+    int x_resolution = 100;
+    int y_resolution = 100;
+    int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
 
-    GLfloat g_vertex_buffer_data[verticii*3];
-    GLfloat g_color_buffer_data[verticii*3];
+    GLfloat g_vertex_buffer_data[num_vertices*3];
+    GLfloat g_color_buffer_data[num_vertices*3];
 
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = 0; j < n - 1; j++) {
-            int qindex = i + (n - 1)*j;
-            for (int k=0; k<2; k++) {
-                int tindex = k + 2*qindex;
-                for (int m = 0; m < 3; m++) {
-                    int vindex = m + 3*tindex;
+    for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
+        glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
 
-                    int i_p = i;
-                    int j_p = j;
-                    if (m == 1) {
-                        i_p++;
-                        j_p++;
-                    }
-                    if (m == 2) {
-                        if (k == 0) {
-                            i_p++;
-                        } else {
-                            j_p++;
-                        }
-                    }
-                    float ux = (float)(i_p)/n;
-                    float uy = (float)(j_p)/n;
-                    float x = 5*(ux - 0.5);
-                    float y = 5*(uy - 0.5);
-                    g_vertex_buffer_data[3*vindex] = x;
-                    g_vertex_buffer_data[1 + 3*vindex] = y;
-                    g_vertex_buffer_data[2 + 3*vindex] = std::exp(-x*x - y*y);
+        float x = 5*(unit_pos.x - 0.5f);
+        float y = 5*(unit_pos.y - 0.5f);
 
-                    g_color_buffer_data[3*vindex] = ux;
-                    g_color_buffer_data[1 + 3*vindex] = uy;
-                    g_color_buffer_data[2 + 3*vindex] = std::exp(-x*x - y*y);
-                }
-            }
-        }
+        g_vertex_buffer_data[0 + 3*vertex_index] = x;
+        g_vertex_buffer_data[2 + 3*vertex_index] = y;
+        g_vertex_buffer_data[1 + 3*vertex_index] = std::exp(-(x*x + y*y));
+
+        g_color_buffer_data[0 + 3*vertex_index] = unit_pos.x;
+        g_color_buffer_data[1 + 3*vertex_index] = unit_pos.y;
+        g_color_buffer_data[2 + 3*vertex_index] = std::exp(-(x*x + y*y));
     }
 
     Model model = Model(shaderID);
     model.setVertexBuffer(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
     model.setColorBuffer(g_color_buffer_data, sizeof(g_color_buffer_data));
-    Object cube = Object(model);
-    return cube;
+    Object surface = Object(model);
+    return surface;
+}
+
+Object initalizeSphere(GLuint shaderID) {
+    int x_resolution = 100; // rows
+    int y_resolution = 50; // columns
+    int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
+
+    GLfloat g_vertex_buffer_data[num_vertices*3];
+    GLfloat g_color_buffer_data[num_vertices*3];
+
+    for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
+        glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
+
+        float theta = 6.28*unit_pos.x;
+        float phi = 3.14*unit_pos.y;
+
+        float x = std::sin(phi)*std::cos(theta);
+        float y = std::sin(phi)*std::sin(theta);
+        float z = std::cos(phi);
+
+        g_vertex_buffer_data[0 + 3*vertex_index] = x;
+        g_vertex_buffer_data[2 + 3*vertex_index] = y;
+        g_vertex_buffer_data[1 + 3*vertex_index] = z;
+
+        g_color_buffer_data[0 + 3*vertex_index] = unit_pos.x;
+        g_color_buffer_data[1 + 3*vertex_index] = unit_pos.y;
+        g_color_buffer_data[2 + 3*vertex_index] = 0.0f;
+    }
+
+    Model model = Model(shaderID);
+    model.setVertexBuffer(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
+    model.setColorBuffer(g_color_buffer_data, sizeof(g_color_buffer_data));
+    Object sphere = Object(model);
+    return sphere;
+}
+
+Object initalizeTorus(GLuint shaderID) {
+    int x_resolution = 100; // rows
+    int y_resolution = 100; // columns
+    int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
+
+    GLfloat g_vertex_buffer_data[num_vertices*3];
+    GLfloat g_color_buffer_data[num_vertices*3];
+
+    for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
+        glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
+
+        float theta = 6.28*unit_pos.x;
+        float phi = 6.28*unit_pos.y;
+
+        float x = (1.0f + 0.5f*std::cos(theta))*std::cos(phi);
+        float y = (1.0f + 0.5f*std::cos(theta))*std::sin(phi);
+        float z = 0.5f*std::sin(theta);
+
+        g_vertex_buffer_data[0 + 3*vertex_index] = x;
+        g_vertex_buffer_data[2 + 3*vertex_index] = y;
+        g_vertex_buffer_data[1 + 3*vertex_index] = z;
+
+        g_color_buffer_data[0 + 3*vertex_index] = unit_pos.x;
+        g_color_buffer_data[1 + 3*vertex_index] = unit_pos.y;
+        g_color_buffer_data[2 + 3*vertex_index] = 0.0f;
+    }
+
+    Model model = Model(shaderID);
+    model.setVertexBuffer(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
+    model.setColorBuffer(g_color_buffer_data, sizeof(g_color_buffer_data));
+    Object torus = Object(model);
+    return torus;
 }
 
 int main() {
@@ -206,11 +231,15 @@ int main() {
 
     AdvancedTimer timer = AdvancedTimer();
     Camera camera = Camera(shaderID);
-    Object cube = initalizeCube(shaderID);
-    cube.velocity = glm::vec3(1.f, 0.f, 0.f);
-    Object cube2 = initalizeCube(shaderID);
-    cube2.velocity = glm::vec3(0.f, 2.f, 0.f);
-    Object cube3 = initalizeSurface(shaderID);
+    Object surface = initalizeSurface(shaderID);
+
+    Object sphere = initalizeSphere(shaderID);
+    sphere.position = glm::vec3(3.0f, 0.0f, -3.0f);
+    sphere.velocity = glm::vec3(0.0f, 10.0f, 0.0f);
+    sphere.acceleration = glm::vec3(0.0f, -9.81f, 0.0f);
+
+    Object torus = initalizeTorus(shaderID);
+    torus.position = glm::vec3(-3.0f, 0.0f, -3.0f);
     double dt;
     do {
         // Timing
@@ -225,13 +254,13 @@ int main() {
         glUseProgram(shaderID);
         camera.update();
 
-        cube.update(dt);
-        cube2.update(dt);
-        cube3.update(dt);
+        surface.update(dt);
+        sphere.update(dt);
+        torus.update(dt);
 
-        cube.drawObject();
-        cube2.drawObject();
-        cube3.drawObject();
+        surface.drawObject();
+        sphere.drawObject();
+        torus.drawObject();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

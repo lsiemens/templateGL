@@ -8,8 +8,12 @@ LDFLAGS = -g
 LDLIBS = -lGLEW -lglfw -lGL -ldl
 
 SRCS = testGL.cpp looplog.cpp frame_timer.cpp model.cpp object.cpp camera.cpp shaders.cpp
-OBJS = $(subst .cpp,.o, $(SRCS))
-TARGET = testGL
+OBJS = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(SRCS))
+TARGET = $(BUILD_DIR)/testGL
+
+BUILD_DIR = build
+
+all: $(BUILD_DIR) $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)
@@ -17,8 +21,11 @@ run: $(TARGET)
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $(TARGET) $(OBJS) $(LDLIBS)
 
-$(OBJS): %.o: %.cpp
-	$(CXX) -c $^ -o $@ $(CXXFLAGS) $(CPPFLAGS)
+$(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
+	$(CXX) -c $< -o $@ $(CXXFLAGS) $(CPPFLAGS)
+
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR) -p
 
 open_documentation: Documentation
 	open ./Documentation/html/index.html
@@ -27,10 +34,9 @@ Documentation:
 	doxygen Doxyfile
 
 clean:
-	rm $(OBJS) -f
-	rm $(TARGET) -f
+	rm $(BUILD_DIR) -rf
 
 clean_doc:
 	rm Documentation -rf
 
-.PHONY: clean clean_doc
+.PHONY: all run open_documentation clean clean_doc

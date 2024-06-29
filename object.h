@@ -6,14 +6,18 @@
 
 #include "model.h"
 
-/// A class for defineing objects using a given model.
+/// A class for defining objects using a given model.
 class Object {
 public:
     Model model;
-    glm::vec3 velocity;
+    float mass=1.f;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 velocity = glm::vec3(0.0f);
+    glm::vec3 acceleration = glm::vec3(0.0f);
+
     glm::mat4 modelSpaceToWorldSpace;
 
-    Object(Model model, glm::vec3 velocity=glm::vec3());
+    Object(Model model);
     void drawObject();
     void update(double dt);
 };
