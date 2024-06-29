@@ -8,12 +8,12 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "looplog.h"
-#include "frame_timer.h"
-#include "model.h"
-#include "object.h"
-#include "camera.h"
-#include "shaders.h"
+#include <looplog.h>
+#include <frame_timer.h>
+#include <model.h>
+#include <object.h>
+#include <camera.h>
+#include <shaders.h>
 
 void Controlls(double dt, GLFWwindow* window, Camera &camera) {
     double horizontalAngle = 3.13f, verticalAngle = 0.f;
