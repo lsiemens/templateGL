@@ -2,14 +2,14 @@
 
 #include <iostream>
 
-LoopLog* LoopLog::instance = nullptr;
+LoopLog* LoopLog::m_instance = nullptr;
 
 LoopLog::LoopLog() {
 }
 
 /// Moves the cursor back to where it was prior to flushing the log.
 void LoopLog::resetCursor() {
-    std::string buffer = log.str();
+    std::string buffer = m_log.str();
     for (char &c : buffer) {
         if (c == '\n') {
             std::cout << "\033[A";
@@ -18,19 +18,19 @@ void LoopLog::resetCursor() {
 }
 
 LoopLog* LoopLog::getInstance() {
-    if (instance == nullptr) {
-        instance = new LoopLog();
+    if (m_instance == nullptr) {
+        m_instance = new LoopLog();
     }
-    return instance;
+    return m_instance;
 }
 
 void LoopLog::flush(){
-    std::string buffer = log.str();
+    std::string buffer = m_log.str();
     if (buffer != "") {
         std::cout << buffer;
         resetCursor();
         std::cout.flush();
     }
-    log.str("");
-    log.clear();
+    m_log.str("");
+    m_log.clear();
 }

@@ -9,15 +9,15 @@
 /// A class for storing model data that can be resued between multiple objects.
 class Model {
 public:
-    GLuint vertexbuffer;
-    GLuint colorbuffer;
-    unsigned int vertexBufferSize;
-    GLuint matrixID;
+    GLuint m_vertexbuffer;
+    GLuint m_colorbuffer;
+    GLsizei m_vertexBufferSize;
+    GLuint m_matrixID;
 
     Model(GLuint shaderID);
     void releaseBuffers();
-    void setVertexBuffer(GLfloat data[], unsigned int bufferSize);
-    void setColorBuffer(GLfloat data[], unsigned int bufferSize);
+    void setVertexBuffer(GLfloat data[], GLsizei bufferSize);
+    void setColorBuffer(GLfloat data[], GLsizei bufferSize);
     void drawModel(glm::mat4 modelSpaceToWorldSpace);
 };
 

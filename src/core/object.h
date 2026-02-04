@@ -9,13 +9,13 @@
 /// A class for defining objects using a given model.
 class Object {
 public:
-    Model model;
-    float mass=1.f;
-    glm::vec3 position = glm::vec3(0.0f);
-    glm::vec3 velocity = glm::vec3(0.0f);
-    glm::vec3 acceleration = glm::vec3(0.0f);
+    Model m_model;
+    float m_mass=1.f;
+    glm::vec3 m_position = glm::vec3(0.0f);
+    glm::vec3 m_velocity = glm::vec3(0.0f);
+    glm::vec3 m_acceleration = glm::vec3(0.0f);
 
-    glm::mat4 modelSpaceToWorldSpace;
+    glm::mat4 m_modelSpaceToWorldSpace;
 
     Object(Model model);
     void drawObject();

@@ -6,76 +6,76 @@
 #include "core/looplog.h"
 
 BasicTimer::BasicTimer() {
-    time = glfwGetTime();
-    previous_time = previous_update = time;
-    frame_count = 0;
+    m_time = glfwGetTime();
+    m_previous_time = m_previous_update = m_time;
+    m_frame_count = 0;
 
-    loopLog = LoopLog::getInstance();
+    m_loopLog = LoopLog::getInstance();
 }
 
-float BasicTimer::timer() {
-    frame_count++;
-    previous_time = time;
-    time = glfwGetTime();
+double BasicTimer::timer() {
+    m_frame_count++;
+    m_previous_time = m_time;
+    m_time = glfwGetTime();
 
-    if (time - previous_update >= 1.0f) {
-        loopLog->log << "FPS: " << static_cast<float>(frame_count)/(time - previous_update) << " Δt (in ms) : " << (time - previous_update)/static_cast<float>(frame_count) << "\n";
-        previous_update = time;
-        frame_count = 0;
+    if (m_time - m_previous_update >= 1.0f) {
+        m_loopLog->m_log << "FPS: " << static_cast<double>(m_frame_count)/(m_time - m_previous_update) << " Δt (in ms) : " << (m_time - m_previous_update)/static_cast<double>(m_frame_count) << "\n";
+        m_previous_update = m_time;
+        m_frame_count = 0;
     }
 
-    return time - previous_time;
+    return m_time - m_previous_time;
 }
 
-float BasicTimer::getTime() const {
-    return time;
+double BasicTimer::getTime() const {
+    return m_time;
 }
 
 /// Reset parameters needed for walford's online algorithm for the variance
 /// aswell as limits for finding the minimum and maximum time step.
 void AdvancedTimer::resetWelford() {
-    min_dt = INFINITY, max_dt = -INFINITY, mean_dt = previous_mean_dt = 0;
-    current_M2 = previous_M2 = 0;
-    frame_count = 0;
+    m_min_dt = INFINITY, m_max_dt = -INFINITY, m_mean_dt = m_previous_mean_dt = 0;
+    m_current_M2 = m_previous_M2 = 0;
+    m_frame_count = 0;
 }
 
 AdvancedTimer::AdvancedTimer() {
-    time = glfwGetTime();
-    previous_time = previous_update = time;
+    m_time = glfwGetTime();
+    m_previous_time = m_previous_update = m_time;
     resetWelford();
 
-    loopLog = LoopLog::getInstance();
+    m_loopLog = LoopLog::getInstance();
 }
 
-float AdvancedTimer::timer() {
-    frame_count++;
-    previous_time = time;
-    previous_mean_dt = mean_dt;
-    previous_M2 = current_M2;
-    time = glfwGetTime();
+double AdvancedTimer::timer() {
+    m_frame_count++;
+    m_previous_time = m_time;
+    m_previous_mean_dt = m_mean_dt;
+    m_previous_M2 = m_current_M2;
+    m_time = glfwGetTime();
 
     //Welford' online algorith for variance
-    float dt = time - previous_time;
-    mean_dt = previous_mean_dt + (dt - previous_mean_dt)/frame_count;
-    current_M2 = previous_M2 + (dt - previous_mean_dt)*(dt - mean_dt);
+    double dt = m_time - m_previous_time;
+    m_mean_dt = m_previous_mean_dt + (dt - m_previous_mean_dt)/m_frame_count;
+    m_current_M2 = m_previous_M2 + (dt - m_previous_mean_dt)*(dt - m_mean_dt);
 
-    if (dt < min_dt) {
-        min_dt = dt;
+    if (dt < m_min_dt) {
+        m_min_dt = dt;
     }
-    if (dt > max_dt) {
-        max_dt = dt;
+    if (dt > m_max_dt) {
+        m_max_dt = dt;
     }
 
-    if (time - previous_update >= 1.0f) {
-        loopLog->log << "FPS: " << static_cast<float>(frame_count)/(time - previous_update) << "\n";
-        loopLog->log << "Δt (in ms) : " << 1000*mean_dt << " ± " << 1000*std::sqrt(current_M2/(frame_count - 1))  << " [Min|Max]: [" << 1000*min_dt << " | " << 1000*max_dt << "]\n";
-        previous_update = time;
+    if (m_time - m_previous_update >= 1.0f) {
+        m_loopLog->m_log << "FPS: " << static_cast<double>(m_frame_count)/(m_time - m_previous_update) << "\n";
+        m_loopLog->m_log << "Δt (in ms) : " << 1000*m_mean_dt << " ± " << 1000*std::sqrt(m_current_M2/(m_frame_count - 1))  << " [Min|Max]: [" << 1000*m_min_dt << " | " << 1000*m_max_dt << "]\n";
+        m_previous_update = m_time;
         resetWelford();
     }
 
-    return time - previous_time;
+    return m_time - m_previous_time;
 }
 
-float AdvancedTimer::getTime() const {
-    return time;
+double AdvancedTimer::getTime() const {
+    return m_time;
 }

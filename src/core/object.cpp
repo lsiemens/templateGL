@@ -1,21 +1,21 @@
 #include "core/object.h"
 
-Object::Object(Model model) : model(model) {
-    modelSpaceToWorldSpace = glm::translate(glm::mat4(1.f), position);
+Object::Object(Model model) : m_model(model) {
+    m_modelSpaceToWorldSpace = glm::translate(glm::mat4(1.f), m_position);
 }
 
 void Object::drawObject() {
-    this->model.drawModel(modelSpaceToWorldSpace);
+    this->m_model.drawModel(m_modelSpaceToWorldSpace);
 }
 
 void Object::update(float dt) {
-    velocity += 0.5f*dt*acceleration;
-    position += dt*velocity;
-    velocity += 0.5f*dt*acceleration;
-    modelSpaceToWorldSpace = glm::translate(glm::mat4(1.0f), position);
+    m_velocity += 0.5f*dt*m_acceleration;
+    m_position += dt*m_velocity;
+    m_velocity += 0.5f*dt*m_acceleration;
+    m_modelSpaceToWorldSpace = glm::translate(glm::mat4(1.0f), m_position);
 
     // fake a floor
-    if ((position.y < 0) && (velocity.y*position.y > 0)) {
-        velocity.y *= -0.9;
+    if ((m_position.y < 0) && (m_velocity.y*m_position.y > 0)) {
+        m_velocity.y *= -0.9f;
     }
 }

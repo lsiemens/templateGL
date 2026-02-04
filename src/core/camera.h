@@ -9,11 +9,11 @@
 
 class Camera {
 public:
-    glm::vec3 position;
-    glm::vec3 direction;
-    glm::vec3 up;
-    float FoV, aspectRatio;
-    GLuint matrixID;
+    glm::vec3 m_position;
+    glm::vec3 m_direction;
+    glm::vec3 m_up;
+    float m_FoV, m_aspectRatio;
+    GLuint m_matrixID;
 
     Camera(GLuint shaderID);
     glm::mat4 getViewMatrix();

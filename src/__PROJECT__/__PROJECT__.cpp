@@ -1,5 +1,4 @@
 #include <cmath>
-#include <random>
 #include <iostream>
 
 // keep this before all other OpenGL libraries
@@ -17,7 +16,7 @@
 #include "core/path_util.h"
 
 void Controlls(float dt, GLFWwindow* window, Camera &camera) {
-    float horizontalAngle = 3.13f, verticalAngle = 0.f;
+    double horizontalAngle = 3.13, verticalAngle = 0.0;
     float speed = 3.f, mouseSensitivity = 0.001f;
 
     double xpos, ypos;
@@ -55,9 +54,9 @@ void Controlls(float dt, GLFWwindow* window, Camera &camera) {
         delta_position = -dt*up*speed;
     }
 
-    camera.direction = direction;
-    camera.up = up;
-    camera.position += delta_position;
+    camera.m_direction = direction;
+    camera.m_up = up;
+    camera.m_position += delta_position;
 }
 
 glm::vec2 meshgrid(int x_resolution, int y_resolution, int vertex_index) {
@@ -72,31 +71,31 @@ glm::vec2 meshgrid(int x_resolution, int y_resolution, int vertex_index) {
 
     // lower left coordinate of triangle on the unit square
     glm::vec2 unit_pos;
-    unit_pos.x = static_cast<float>(row_index)/(x_resolution - 1);
-    unit_pos.y = static_cast<float>(column_index)/(y_resolution - 1);
+    unit_pos.x = static_cast<float>(row_index)/static_cast<float>(x_resolution - 1);
+    unit_pos.y = static_cast<float>(column_index)/static_cast<float>(y_resolution - 1);
 
     // offset for the upper right vertex
     if (triangle_vertex_index == 1) {
-        unit_pos.x += 1.0f/(x_resolution - 1);
-        unit_pos.y += 1.0f/(y_resolution - 1);
+        unit_pos.x += 1.0f/static_cast<float>(x_resolution - 1);
+        unit_pos.y += 1.0f/static_cast<float>(y_resolution - 1);
     }
 
     // offsets for the off diagonal vertex. The spesific offset
     // is dependent on if it is the upper or lower triangle
     if (triangle_vertex_index == 2){
         if (quad_triangle_index == 0) {
-            unit_pos.x += 1.0f/(x_resolution - 1);
+            unit_pos.x += 1.0f/static_cast<float>(x_resolution - 1);
         } else {
-            unit_pos.y += 1.0f/(y_resolution - 1);
+            unit_pos.y += 1.0f/static_cast<float>(y_resolution - 1);
         }
     }
     return unit_pos;
 }
 
 Object initalizeSurface(GLuint shaderID) {
-    int x_resolution = 100;
-    int y_resolution = 100;
-    int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
+    constexpr int x_resolution = 100;
+    constexpr int y_resolution = 100;
+    constexpr int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
 
     GLfloat g_vertex_buffer_data[num_vertices*3];
     GLfloat g_color_buffer_data[num_vertices*3];
@@ -124,9 +123,9 @@ Object initalizeSurface(GLuint shaderID) {
 }
 
 Object initalizeSphere(GLuint shaderID) {
-    int x_resolution = 32; // rows
-    int y_resolution = 16; // columns
-    int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
+    constexpr int x_resolution = 32; // rows
+    constexpr int y_resolution = 16; // columns
+    constexpr int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
 
     GLfloat g_vertex_buffer_data[num_vertices*3];
     GLfloat g_color_buffer_data[num_vertices*3];
@@ -134,8 +133,8 @@ Object initalizeSphere(GLuint shaderID) {
     for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
         glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
 
-        float theta = 6.28*unit_pos.x;
-        float phi = 3.14*unit_pos.y;
+        float theta = 6.28f*unit_pos.x;
+        float phi = 3.14f*unit_pos.y;
 
         float x = std::sin(phi)*std::cos(theta);
         float y = std::sin(phi)*std::sin(theta);
@@ -158,9 +157,9 @@ Object initalizeSphere(GLuint shaderID) {
 }
 
 Object initalizeTorus(GLuint shaderID) {
-    int x_resolution = 100; // rows
-    int y_resolution = 100; // columns
-    int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
+    constexpr int x_resolution = 100; // rows
+    constexpr int y_resolution = 100; // columns
+    constexpr int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
 
     GLfloat g_vertex_buffer_data[num_vertices*3];
     GLfloat g_color_buffer_data[num_vertices*3];
@@ -168,8 +167,8 @@ Object initalizeTorus(GLuint shaderID) {
     for (int vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
         glm::vec2 unit_pos = meshgrid(x_resolution, y_resolution, vertex_index);
 
-        float theta = 6.28*unit_pos.x;
-        float phi = 6.28*unit_pos.y;
+        float theta = 6.28f*unit_pos.x;
+        float phi = 6.28f*unit_pos.y;
 
         float x = (1.0f + 0.5f*std::cos(theta))*std::cos(phi);
         float y = (1.0f + 0.5f*std::cos(theta))*std::sin(phi);
@@ -193,7 +192,6 @@ Object initalizeTorus(GLuint shaderID) {
 
 int main() {
     LoopLog* loopLog = LoopLog::getInstance();
-    srand(time(NULL));
     if (!glfwInit()) {
         std::cerr << "Failed to initalize GLFW\n";
         return -1;
@@ -235,16 +233,16 @@ int main() {
     Object surface = initalizeSurface(shaderID);
 
     Object sphere = initalizeSphere(shaderID);
-    sphere.position = glm::vec3(3.0f, 0.0f, -3.0f);
-    sphere.velocity = glm::vec3(0.0f, 10.0f, 0.0f);
-    sphere.acceleration = glm::vec3(0.0f, -9.81f, 0.0f);
+    sphere.m_position = glm::vec3(3.0f, 0.0f, -3.0f);
+    sphere.m_velocity = glm::vec3(0.0f, 10.0f, 0.0f);
+    sphere.m_acceleration = glm::vec3(0.0f, -9.81f, 0.0f);
 
     Object torus = initalizeTorus(shaderID);
-    torus.position = glm::vec3(-3.0f, 0.0f, -3.0f);
+    torus.m_position = glm::vec3(-3.0f, 0.0f, -3.0f);
     float dt;
     do {
         // Timing
-        dt = timer.timer();
+        dt = static_cast<float>(timer.timer());
         loopLog->flush();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

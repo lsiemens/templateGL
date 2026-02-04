@@ -11,7 +11,7 @@
 /// LoopLog should only be flushed once per render iteration.
 class LoopLog {
 private:
-    static LoopLog* instance;
+    static LoopLog* m_instance;
 
     LoopLog();
 
@@ -22,7 +22,7 @@ private:
     LoopLog(const LoopLog&) = delete;
     LoopLog& operator=(const LoopLog&) = delete;
 public:
-    std::stringstream log;
+    std::stringstream m_log;
 
     /// Gets and instance of the LoogLoop singleton.
     /// @return Pointer to an instance of LoogLoop.

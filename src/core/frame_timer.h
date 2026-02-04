@@ -15,22 +15,22 @@ public:
     /// Calculates the current time step and adds the frame rate to the
     /// `LoopLog` buffer.
     /// @return Time since the previous invocation of `timer()`.
-    virtual float timer() = 0;
+    virtual double timer() = 0;
     /// @return The time since the GLFW window was created.
-    virtual float getTime() const = 0;
+    virtual double getTime() const = 0;
 };
 
 /// This implementation of `FrameTimer` computes the times step and addes
 /// only the frame rate to the `LoopLog` buffer.
 class BasicTimer : public FrameTimer {
 private:
-    float time, previous_time, previous_update;
-    unsigned int frame_count;
-    LoopLog* loopLog;
+    double m_time, m_previous_time, m_previous_update;
+    unsigned int m_frame_count;
+    LoopLog* m_loopLog;
 public:
     BasicTimer();
-    float timer() override;
-    float getTime() const override;
+    double timer() override;
+    double getTime() const override;
 };
 
 /// This implementation of `FrameTimer` computes the times step and addes
@@ -38,20 +38,20 @@ public:
 /// `LoopLog` buffer.
 class AdvancedTimer : public FrameTimer {
 private:
-    float time, previous_time, previous_update;
-    float min_dt, max_dt, mean_dt, previous_mean_dt;
-    float current_M2, previous_M2;
+    double m_time, m_previous_time, m_previous_update;
+    double m_min_dt, m_max_dt, m_mean_dt, m_previous_mean_dt;
+    double m_current_M2, m_previous_M2;
 
-    unsigned int frame_count;
-    LoopLog* loopLog;
+    unsigned int m_frame_count;
+    LoopLog* m_loopLog;
 
     /// Reset parameters used to compute Welford's online algorithm
     /// for the variance.
     void resetWelford();
 public:
     AdvancedTimer();
-    float timer() override;
-    float getTime() const override;
+    double timer() override;
+    double getTime() const override;
 };
 
 #endif
