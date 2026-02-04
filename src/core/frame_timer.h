@@ -1,7 +1,7 @@
 #ifndef FRAME_TIMER_H
 #define FRAME_TIMER_H
 
-#include "looplog.h"
+#include "core/looplog.h"
 
 /// An interface for timming the render loop. One of the implementations
 /// of `FrameTimer` should be used to calculate time steps in the render

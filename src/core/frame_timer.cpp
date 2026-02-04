@@ -1,9 +1,9 @@
-#include "frame_timer.h"
+#include "core/frame_timer.h"
 
 #include <cmath>
 #include <GLFW/glfw3.h>
 
-#include "looplog.h"
+#include "core/looplog.h"
 
 BasicTimer::BasicTimer() {
     time = glfwGetTime();

@@ -1,4 +1,4 @@
-#include "object.h"
+#include "core/object.h"
 
 Object::Object(Model model) : model(model) {
     modelSpaceToWorldSpace = glm::translate(glm::mat4(1.f), position);

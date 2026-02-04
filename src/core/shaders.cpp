@@ -1,4 +1,4 @@
-#include "shaders.h"
+#include "core/shaders.h"
 
 #include <vector>
 #include <string>
@@ -7,12 +7,22 @@
 #include <sstream>
 #include <stdexcept>
 
-GLuint CompileShader(const char* shader_file_path, GLenum shader_type){
+#include "path_util.h"
+
+GLuint CompileShader(const std::string& shader_file_path, GLenum shader_type){
     GLuint ShaderID = glCreateShader(shader_type);
+
+    std::string fixed_path;
+    try {
+        fixed_path = get_fixed_path(shader_file_path).string();
+    } catch (...) {
+        std::cerr << "Failed to get absolute path of '" << shader_file_path << "'.\n";
+        throw;
+    }
 
     //Get Code
     std::string ShaderCode;
-    std::ifstream ShaderStream(shader_file_path, std::ios::in);
+    std::ifstream ShaderStream(fixed_path, std::ios::in);
     if (ShaderStream.is_open()) {
         std::stringstream shader_code;
         shader_code << ShaderStream.rdbuf();
@@ -45,7 +55,7 @@ GLuint CompileShader(const char* shader_file_path, GLenum shader_type){
     return ShaderID;
 }
 
-GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path){
+GLuint LoadShaders(const std::string& vertex_file_path, const std::string& fragment_file_path){
     GLuint VertexShaderID = CompileShader(vertex_file_path, GL_VERTEX_SHADER);
     GLuint FragmentShaderID = CompileShader(fragment_file_path, GL_FRAGMENT_SHADER);
 

@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
-#include "model.h"
+#include "core/model.h"
 
 /// A class for defining objects using a given model.
 class Object {

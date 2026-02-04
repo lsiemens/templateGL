@@ -1,4 +1,4 @@
-#include "model.h"
+#include "core/model.h"
 
 Model::Model(GLuint shaderID) {
     matrixID = glGetUniformLocation(shaderID, "ModelTransform");

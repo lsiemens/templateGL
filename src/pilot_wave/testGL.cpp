@@ -8,12 +8,13 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include <looplog.h>
-#include <frame_timer.h>
-#include <model.h>
-#include <object.h>
-#include <camera.h>
-#include <shaders.h>
+#include "core/looplog.h"
+#include "core/frame_timer.h"
+#include "core/model.h"
+#include "core/object.h"
+#include "core/camera.h"
+#include "core/shaders.h"
+#include "core/path_util.h"
 
 void Controlls(float dt, GLFWwindow* window, Camera &camera) {
     float horizontalAngle = 3.13f, verticalAngle = 0.f;
@@ -123,8 +124,8 @@ Object initalizeSurface(GLuint shaderID) {
 }
 
 Object initalizeSphere(GLuint shaderID) {
-    int x_resolution = 100; // rows
-    int y_resolution = 50; // columns
+    int x_resolution = 32; // rows
+    int y_resolution = 16; // columns
     int num_vertices = (x_resolution - 1)*(y_resolution - 1)*2*3; // (x_resolution - 1)*(y_resolution - 1) quads, 2 triangles per quad, 3 points per triangle
 
     GLfloat g_vertex_buffer_data[num_vertices*3];
@@ -227,7 +228,7 @@ int main() {
     glBindVertexArray(VertexArrayID);
 
     // Initalize shader
-    GLuint shaderID = LoadShaders("vertex.shader", "fragment.shader");
+    GLuint shaderID = LoadShaders("assets/vertex.glsl", "assets/fragment.glsl");
 
     AdvancedTimer timer = AdvancedTimer();
     Camera camera = Camera(shaderID);
