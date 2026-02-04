@@ -35,8 +35,12 @@ if(BUILD_DOCS)
         set(DOXYGEN_PROJECT_NAME "${PROJECT_NAME}")
         set(DOXYGEN_PROJECT_NUMBER "${PROJECT_VERSION}")
         set(DOXYGEN_PROJECT_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINDARY_DIR}/doxygen")
+        set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${PROJECT_SOURCE_DIR}/README.md")
+
         set(DOXYGEN_PROJECT_GENERATE_HTML YES)
-        doxygen_add_docs(__PROJECT___docs
+        set(DOXYGEN_RECURSIVE YES)
+        doxygen_add_docs(__PROJECT___docs ALL
+            "${PROJECT_SOURCE_DIR}/README.md"
             "${PROJECT_SOURCE_DIR}/src"
             COMMENT "Generating Doxygen documentation")
     else()
